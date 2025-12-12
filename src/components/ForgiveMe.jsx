@@ -171,6 +171,14 @@ function loadResponses() {
 
 
 function Landing({ name, setName, onSubmitName, onAnswer }) {
+  const handleAnswer = (ans) => {
+    if (!name || !name.trim()) {
+      alert("Please enter your name first.");
+      return;
+    }
+    onAnswer(ans);
+  };
+
   return (
     <div className="text-center">
       <p className="text-lg text-pink-600 mb-4">I am sorry. Will you forgive me?</p>
@@ -179,21 +187,22 @@ function Landing({ name, setName, onSubmitName, onAnswer }) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Your name (optional)"
+          placeholder="Your name"
           className="px-4 py-2 rounded-lg border w-64 text-center"
+          required
         />
       </form>
 
       <div className="flex justify-center gap-6 mt-4">
         <button
-          onClick={() => onAnswer("yes")}
+          onClick={() => handleAnswer("yes")}
           className="px-6 py-3 rounded-full bg-pink-600 text-white font-semibold shadow hover:scale-105 transform transition"
         >
           Yes, I forgot
         </button>
 
         <button
-          onClick={() => onAnswer("no")}
+          onClick={() => handleAnswer("no")}
           className="px-6 py-3 rounded-full border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50"
         >
           No
@@ -370,12 +379,9 @@ function AdminPanel({ responses, pin, setPin, onClear }) {
         <div className="space-y-2 max-h-64 overflow-auto">
           {responses.map(r => (
             <div key={r.id} className="p-3 bg-white rounded shadow-sm border">
+              <div className="font-bold text-pink-700 mb-1">{r.name || "Anonymous"}</div>
               <div className="text-sm text-gray-700"><strong>Answer:</strong> {r.answer}</div>
-              <div className="text-xs text-gray-500">At: {new Date(r.time).toLocaleString()}</div>
-              {r.name ? (
-              <div className="text-xs text-gray-600">Name: {r.name}</div>
-              ) : null}
-
+              <div className="text-xs text-gray-500 mt-1">At: {new Date(r.time).toLocaleString()}</div>
             </div>
           ))}
         </div>
