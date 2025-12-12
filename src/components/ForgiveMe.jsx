@@ -143,10 +143,18 @@ export default function ForgiveMe() {
         </main>
 
         {/* Decorative hearts in the corner */}
-        <div aria-hidden className="pointer-events-none absolute bottom-6 right-6 opacity-30">
+        <div aria-hidden className="pointer-events-none absolute bottom-6 right-6 opacity-30 float-heart">
           <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-pink-300">
-            <path d="M12 21s-6-4.35-9-7.5A5.5 5.5 0 0 1 3 5.5C3 3.5 5 2 6.8 2c1.4 0 2.4.9 3.2 1.8C11 2.9 12 2 13.4 2 15.2 2 17.2 3.5 17.2 5.5c0 2.8-2.3 5.9-5.2 9.5z"/>
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
+          <style>{`
+            .float-heart { animation: float 6s ease-in-out infinite; }
+            @keyframes float {
+              0% { transform: translateY(0px); }
+              50% { transform: translateY(-20px); }
+              100% { transform: translateY(0px); }
+            }
+          `}</style>
         </div>
       </div>
     </div>
@@ -287,13 +295,22 @@ function TypedNote({ initialText }) {
   );
 }
 
-function HeartPulse(
-) {
+function HeartPulse() {
   return (
     <div className="w-12 h-12 flex items-center justify-center">
-      <svg viewBox="0 0 24 24" className="w-10 h-10 animate-pulse text-pink-500">
-        <path fill="currentColor" d="M12 21s-6-4.35-9-7.5A5.5 5.5 0 0 1 3 5.5C3 3.5 5 2 6.8 2c1.4 0 2.4.9 3.2 1.8C11 2.9 12 2 13.4 2 15.2 2 17.2 3.5 17.2 5.5c0 2.8-2.3 5.9-5.2 9.5z"/>
+      <svg viewBox="0 0 24 24" className="w-10 h-10 text-pink-500 heart-beat">
+        <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
       </svg>
+      <style>{`
+        .heart-beat { animation: heartBeat 1.5s infinite; }
+        @keyframes heartBeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.3); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.3); }
+          70% { transform: scale(1); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -307,34 +324,86 @@ function ParticleField() {
     const ctx = canvas.getContext("2d");
     let w = canvas.width = canvas.offsetWidth;
     let h = canvas.height = canvas.offsetHeight;
-    const particles = [];
+    
+    let particles = [];
+    const particleCount = 700; // Number of particles forming the heart
 
-    function rand(min, max) { return Math.random() * (max - min) + min; }
+    function initParticles() {
+      particles = [];
+      const cx = w / 2;
+      const cy = h / 2;
+      // Scale heart to fit screen (adjust divisor to change size)
+      const scale = Math.min(w, h) / 45; 
 
-    for (let i = 0; i < 40; i++) {
-      particles.push({
-        x: rand(0, w), y: rand(0, h), vx: rand(-0.4, 0.4), vy: rand(-0.6, -0.2), r: rand(4, 10), life: rand(80, 200)
-      });
+      for (let i = 0; i < particleCount; i++) {
+        // Parametric heart equation:
+        // x = 16 sin^3(t)
+        // y = 13 cos(t) - 5 cos(2t) - 2 cos(3t) - cos(4t)
+        const t = Math.random() * Math.PI * 2;
+        
+        // Basic heart shape coordinates
+        const xRaw = 16 * Math.pow(Math.sin(t), 3);
+        const yRaw = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+        
+        // Add some randomness to make the heart look composed of particles rather than a thin line
+        // We can scatter them slightly inside or around the line
+        const jitter = 1.5; 
+        const xTarget = (xRaw + (Math.random() - 0.5) * jitter) * scale + cx;
+        const yTarget = (yRaw + (Math.random() - 0.5) * jitter) * scale + cy;
+
+        particles.push({
+          targetX: xTarget,
+          targetY: yTarget,
+          // Start particles from random positions (or center) for formation effect
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 2 + 1,
+          color: `rgba(255, ${100 + Math.floor(Math.random() * 100)}, ${150 + Math.floor(Math.random() * 100)}, ${0.6 + Math.random() * 0.4})`,
+          speed: 0.02 + Math.random() * 0.03
+        });
+      }
     }
 
+    initParticles();
+
     let raf;
+    let time = 0;
     function loop() {
       ctx.clearRect(0, 0, w, h);
+      time += 0.03;
+      
+      // Heartbeat pulse animation
+      // Using a combination of sine waves to mimic a heartbeat rhythm
+      const pulse = 1 + (Math.sin(time * 3) * 0.03); 
+
+      const cx = w / 2;
+      const cy = h / 2;
+
       for (let p of particles) {
-        p.x += p.vx; p.y += p.vy; p.life -= 1;
+        // Calculate target position with pulse applied relative to center
+        const dx = p.targetX - cx;
+        const dy = p.targetY - cy;
+        
+        const tx = cx + dx * pulse;
+        const ty = cy + dy * pulse;
+
+        // Ease particles towards their target position
+        p.x += (tx - p.x) * p.speed;
+        p.y += (ty - p.y) * p.speed;
+
         ctx.beginPath();
-        ctx.globalAlpha = Math.max(0, p.life / 200);
-        ctx.fillStyle = "rgba(255, 105, 180, 1)"; // pink hearts
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
-        if (p.life <= 0 || p.y < -20) {
-          p.x = rand(0, w); p.y = h + 20; p.vx = rand(-0.4,0.4); p.vy = rand(-0.8, -0.2); p.life = rand(80,200);
-        }
       }
       raf = requestAnimationFrame(loop);
     }
 
-    function handleResize() { w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+    function handleResize() { 
+      w = canvas.width = canvas.offsetWidth; 
+      h = canvas.height = canvas.offsetHeight; 
+      initParticles();
+    }
     window.addEventListener("resize", handleResize);
     loop();
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", handleResize); };
