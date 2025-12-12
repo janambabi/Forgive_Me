@@ -88,8 +88,11 @@ export default function ForgiveMe() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Particle canvas - moved to background of the entire page */}
+      {page === "celebrate" && <ParticleField />}
+
+      <div className={`w-full max-w-2xl rounded-2xl p-8 relative z-10 ${page === "celebrate" ? "bg-transparent" : "bg-white/80 backdrop-blur-lg shadow-2xl"}`}>
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-extrabold tracking-tight text-pink-700">Forgive Me?</h1>
           <div className="flex gap-2 items-center">
@@ -217,7 +220,6 @@ function Landing({ name, setName, onSubmitName, onAnswer }) {
         </button>
       </div>
 
-      <p className="mt-6 text-sm text-gray-500">(Your answer will be recorded on this site.)</p>
     </div>
   );
 }
@@ -235,9 +237,7 @@ function NoPage({ onBack }) {
 function Celebrate({ note, setNote, audioRef }) {
   return (
     <div className="relative flex flex-col items-center justify-center py-8">
-      {/* Particle canvas */}
-      <ParticleField />
-
+      
       <div className="z-10 text-center px-6">
         <div className="inline-flex items-center gap-3 mb-4">
           <HeartPulse />
