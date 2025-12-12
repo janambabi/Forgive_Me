@@ -228,7 +228,7 @@ function NoPage({ onBack }) {
   return (
     <div className="text-center py-12">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">I understand.</h2>
-      <p className="text-gray-600 mb-6">If You Really Don't Want To Talk With You Think Im True Or Not, If You Think It Was True Then Break Your Promise And Come To Me Im Still Here For You.</p>
+      <p className="text-gray-600 mb-6">If You Really Don't Want To Talk With Me. Think Im True Or Not, If You Think It Was True Then Break Your Promise And Come To Me Im Still Here For You.</p>
       <button onClick={onBack} className="px-5 py-2 border rounded">Go back</button>
     </div>
   );
