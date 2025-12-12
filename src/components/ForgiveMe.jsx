@@ -16,7 +16,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 const STORAGE_KEY = "forgive_me_responses_v1";
 const WEBHOOK_URL = ""; // OPTIONAL: set to your server/webhook URL to receive responses remotely
-const ADMIN_PIN = "1234"; // change for your deployed site if you want a tiny gate to the responses panel
+const ADMIN_PIN = "04062008"; // change for your deployed site if you want a tiny gate to the responses panel
 
 export default function ForgiveMe() {
   const [page, setPage] = useState("landing"); // 'landing' | 'celebrate' | 'no'
